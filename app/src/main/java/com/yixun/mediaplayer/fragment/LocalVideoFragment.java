@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -26,31 +27,21 @@ import java.util.ArrayList;
  * Created by zongkaili on 2017/3/21.
  */
 public class LocalVideoFragment extends BaseFragment {
+    private static final String TAG = LocalVideoFragment.class.getSimpleName();
     private ListView listview;
     private TextView tv_no_media;
     private LocalVideoAdapter adapter;
-
-    /**
-     * 数据集合
-     */
     private ArrayList<MediaItem> mediaItems;
 
     private Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            //设置适配器
             if (mediaItems != null && mediaItems.size() >0) {
-                //有数据
-                //文本隐藏
                 tv_no_media.setVisibility(View.GONE);
                 adapter = new LocalVideoAdapter(mContext,mediaItems, true);
-                //设置适配器
                 listview.setAdapter(adapter);
-
             } else {
-                //没有数据
-                //文本显示
                 tv_no_media.setVisibility(View.VISIBLE);
             }
         }
@@ -58,7 +49,7 @@ public class LocalVideoFragment extends BaseFragment {
 
     @Override
     public View initView() {
-        Log.e("TAG", "本地视频ui初始化了。。");
+        Log.e(TAG, "本地视频ui初始化了。。");
         View view = View.inflate(mContext, R.layout.fragment_local_video, null);
         listview = (ListView) view.findViewById(R.id.listview);
         tv_no_media = (TextView) view.findViewById(R.id.tv_no_media);

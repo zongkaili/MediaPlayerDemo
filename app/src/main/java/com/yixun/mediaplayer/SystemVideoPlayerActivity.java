@@ -37,8 +37,8 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class SystemVideoPlayerActivity extends Activity implements View.OnClickListener {
-
     private static final String TAG = SystemVideoPlayerActivity.class.getSimpleName();//"SystemVideoPlayerActivity;
+
     private static final int VIDEO_TYPE_DEFAULT = 1;//视频默认屏幕大小播放
     private static final int VIDEO_TYPE_FULL = 2;//视频全屏播放
     private YXVideoView videoview;
@@ -215,14 +215,10 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
         public boolean onSingleTapConfirmed(MotionEvent e) {
 //            Toast.makeText(SystemVideoPlayerActivity.this, "我被单击", Toast.LENGTH_SHORT).show();
             if (isShowMediaController) {
-                //隐藏
                 hideMediaController();
-                //把消息移除
                 handler.removeMessages(HIDE_MEDIA_CONTROLLER);
             } else {
-                //显示
                 showMediaController();
-                //重新发消息-4秒隐藏
                 handler.sendEmptyMessageDelayed(HIDE_MEDIA_CONTROLLER, 4000);
             }
             return super.onSingleTapConfirmed(e);
@@ -911,15 +907,8 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
     }
 
     private float startY;
-    /**
-     * 滑动的区域
-     */
-    private int touchRang = 0;
-
-    /**
-     * 当按下的时候的音量
-     */
-    private int mVol;
+    private int touchRang = 0;//滑动的区域
+    private int mVol;//当按下的时候的音量
     private float startX;
 
     @Override
