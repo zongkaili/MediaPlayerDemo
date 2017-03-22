@@ -27,6 +27,7 @@ import java.util.ArrayList;
  */
 public class LocalVideoFragment extends BaseFragment {
     private static final String TAG = LocalVideoFragment.class.getSimpleName();
+    private static final int GET_DATA_SUCCESS = 1;
     private ListView listview;
     private TextView tv_no_media;
     private LocalVideoAdapter adapter;
@@ -36,12 +37,16 @@ public class LocalVideoFragment extends BaseFragment {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            if (mediaItems != null && mediaItems.size() >0) {
-                tv_no_media.setVisibility(View.GONE);
-                adapter = new LocalVideoAdapter(mContext,mediaItems, true);
-                listview.setAdapter(adapter);
-            } else {
-                tv_no_media.setVisibility(View.VISIBLE);
+            switch (msg.what){
+                case GET_DATA_SUCCESS:
+                    if (mediaItems != null && mediaItems.size() >0) {
+                        tv_no_media.setVisibility(View.GONE);
+                        adapter = new LocalVideoAdapter(mContext,mediaItems, true);
+                        listview.setAdapter(adapter);
+                    } else {
+                        tv_no_media.setVisibility(View.VISIBLE);
+                    }
+                    break;
             }
         }
     };
@@ -65,18 +70,18 @@ public class LocalVideoFragment extends BaseFragment {
             MediaItem mediaItem = mediaItems.get(position);
 
             //系统播放器videoView播放界面
-            Intent intent = new Intent(mContext,SystemVideoPlayerActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("videolist",mediaItems);
-            intent.putExtras(bundle);
-            intent.putExtra("position",position);
-            startActivity(intent);
+//            Intent intent = new Intent(mContext,SystemVideoPlayerActivity.class);
+//            Bundle bundle = new Bundle();
+//            bundle.putSerializable("videolist",mediaItems);
+//            intent.putExtras(bundle);
+//            intent.putExtra("position",position);
+//            startActivity(intent);
 
             //播放网络视频
 //            JCVideoPlayerStandard.startFullscreen(mContext, JCVideoPlayerStandard.class, "http://2449.vod.myqcloud.com/2449_22ca37a6ea9011e5acaaf51d105342e3.f20.mp4", "嫂子辛苦了");
             //播放本地视频
-//            YXVideoPlayerStandard.startFullscreen(mContext, YXVideoPlayerStandard.class,
-//                    mediaItem.getData(), mediaItem.getName());
+            YXVideoPlayerStandard.startFullscreen(mContext, YXVideoPlayerStandard.class,
+                    mediaItem.getData(), mediaItem.getName());
 
         }
     }
@@ -97,7 +102,6 @@ public class LocalVideoFragment extends BaseFragment {
             @Override
             public void run() {
                 super.run();
-
                 //初始化集合
                 mediaItems = new ArrayList<MediaItem>();
                 ContentResolver resolver = mContext.getContentResolver();
@@ -112,9 +116,7 @@ public class LocalVideoFragment extends BaseFragment {
                 };
                 Cursor cusor = resolver.query(uri, objs, null, null, null);
                 if (cusor != null) {
-
                     while (cusor.moveToNext()) {
-
                         MediaItem mediaItem = new MediaItem();
 
                         //添加到集合中
@@ -132,14 +134,11 @@ public class LocalVideoFragment extends BaseFragment {
                         mediaItem.setArtist(artist);
 
                     }
-
                     cusor.close();
                 }
 
                 //发消息-切换到主线程
-                handler.sendEmptyMessage(2);
-
-
+                handler.sendEmptyMessage(GET_DATA_SUCCESS);
             }
         }.start();
 

@@ -37,7 +37,7 @@ import java.util.TimerTask;
  */
 public abstract class YXVideoPlayer extends FrameLayout implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, View.OnTouchListener {
 
-    public static final String TAG = "JieCaoVideoPlayer";
+    public static final String TAG = YXVideoPlayerManager.class.getSimpleName();
 
     public static boolean ACTION_BAR_EXIST = true;
     public static boolean TOOL_BAR_EXIST = true;

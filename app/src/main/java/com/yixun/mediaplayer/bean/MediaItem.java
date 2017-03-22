@@ -10,7 +10,7 @@ public class MediaItem implements Serializable {
     String name ;
     long duration ;
     long size ;
-    String data ;
+    String data ;//视频地址
     String artist ;
     String imageUrl;//图片路径
     String desc;//描述

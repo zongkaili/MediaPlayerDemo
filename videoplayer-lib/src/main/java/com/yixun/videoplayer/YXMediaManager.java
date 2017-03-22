@@ -21,8 +21,16 @@ import java.util.Map;
  * Created by Nathen
  * On 2015/11/30 15:39
  */
-public class YXMediaManager implements TextureView.SurfaceTextureListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnSeekCompleteListener, MediaPlayer.OnErrorListener, MediaPlayer.OnInfoListener, MediaPlayer.OnVideoSizeChangedListener {
-    public static String TAG = "JieCaoVideoPlayer";
+public class YXMediaManager implements
+        TextureView.SurfaceTextureListener,
+        MediaPlayer.OnPreparedListener,
+        MediaPlayer.OnCompletionListener,
+        MediaPlayer.OnBufferingUpdateListener,
+        MediaPlayer.OnSeekCompleteListener,
+        MediaPlayer.OnErrorListener,
+        MediaPlayer.OnInfoListener,
+        MediaPlayer.OnVideoSizeChangedListener {
+    public static String TAG = YXMediaManager.class.getSimpleName();
 
     private static YXMediaManager JCMediaManager;
     public static YXResizeTextureView textureView;

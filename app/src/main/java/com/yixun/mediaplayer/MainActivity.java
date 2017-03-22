@@ -1,5 +1,6 @@
 package com.yixun.mediaplayer;
 
+import android.content.res.Configuration;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -55,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
                 //Fragment-当前的Fragment
                 Fragment currentFragment = mFragments.get(mPagePos);
                 switchFragment(currentFragment);
-
             }
         });
 
@@ -98,5 +98,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         YXVideoPlayer.releaseAllVideos();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 }

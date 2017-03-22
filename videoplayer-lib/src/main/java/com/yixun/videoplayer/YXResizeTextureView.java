@@ -15,7 +15,7 @@ import android.view.TextureView;
  * On 2016/06/02 00:01
  */
 public class YXResizeTextureView extends TextureView {
-    protected static final String TAG = "JCResizeTextureView";
+    protected static final String TAG = YXResizeTextureView.class.getSimpleName();
 
     // x as width, y as height
     protected Point mVideoSize;
