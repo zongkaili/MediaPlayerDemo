@@ -7,9 +7,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -33,7 +35,6 @@ public class JCVideoPlayerStandard extends JCVideoPlayer {
     public ProgressBar bottomProgressBar, loadingProgressBar;
     public TextView titleTextView;
     public ImageView thumbImageView;
-    public ImageView coverImageView;
     public ImageView tinyBackImageView;
 
 
@@ -51,11 +52,10 @@ public class JCVideoPlayerStandard extends JCVideoPlayer {
     @Override
     public void init(Context context) {
         super.init(context);
-        bottomProgressBar = (ProgressBar) findViewById(R.id.bottom_progressbar);
+        bottomProgressBar = (ProgressBar) findViewById(R.id.bottom_progress);
         titleTextView = (TextView) findViewById(R.id.title);
         backButton = (ImageView) findViewById(R.id.back);
         thumbImageView = (ImageView) findViewById(R.id.thumb);
-        coverImageView = (ImageView) findViewById(R.id.cover);
         loadingProgressBar = (ProgressBar) findViewById(R.id.loading);
         tinyBackImageView = (ImageView) findViewById(R.id.back_tiny);
 
@@ -66,27 +66,35 @@ public class JCVideoPlayerStandard extends JCVideoPlayer {
     }
 
     @Override
-    public boolean setUp(String url, int screen, Object... objects) {
-        if (objects.length == 0) return false;
-        if (super.setUp(url, screen, objects)) {
-            titleTextView.setText(objects[0].toString());
-            if (currentScreen == SCREEN_WINDOW_FULLSCREEN) {
-                fullscreenButton.setImageResource(R.drawable.jc_shrink);
-                backButton.setVisibility(View.VISIBLE);
-                tinyBackImageView.setVisibility(View.INVISIBLE);
-            } else if (currentScreen == SCREEN_LAYOUT_NORMAL
-                    || currentScreen == SCREEN_LAYOUT_LIST) {
-                fullscreenButton.setImageResource(R.drawable.jc_enlarge);
-                backButton.setVisibility(View.GONE);
-                tinyBackImageView.setVisibility(View.INVISIBLE);
-            } else if (currentScreen == SCREEN_WINDOW_TINY) {
-                tinyBackImageView.setVisibility(View.VISIBLE);
-                setAllControlsVisible(View.INVISIBLE, View.INVISIBLE, View.INVISIBLE,
-                        View.INVISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
-            }
-            return true;
+    public void setUp(String url, int screen, Object... objects) {
+        super.setUp(url, screen, objects);
+        if (objects.length == 0) return;
+        titleTextView.setText(objects[0].toString());
+        if (currentScreen == SCREEN_WINDOW_FULLSCREEN) {
+            fullscreenButton.setImageResource(R.drawable.jc_shrink);
+            backButton.setVisibility(View.VISIBLE);
+            tinyBackImageView.setVisibility(View.INVISIBLE);
+            changeStartButtonSize((int) getResources().getDimension(R.dimen.jc_start_button_w_h_fullscreen));
+        } else if (currentScreen == SCREEN_LAYOUT_NORMAL
+                || currentScreen == SCREEN_LAYOUT_LIST) {
+            fullscreenButton.setImageResource(R.drawable.jc_enlarge);
+            backButton.setVisibility(View.GONE);
+            tinyBackImageView.setVisibility(View.INVISIBLE);
+            changeStartButtonSize((int) getResources().getDimension(R.dimen.jc_start_button_w_h_normal));
+        } else if (currentScreen == SCREEN_WINDOW_TINY) {
+            tinyBackImageView.setVisibility(View.VISIBLE);
+            setAllControlsVisible(View.INVISIBLE, View.INVISIBLE, View.INVISIBLE,
+                    View.INVISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE);
         }
-        return false;
+    }
+
+    public void changeStartButtonSize(int size) {
+        ViewGroup.LayoutParams lp = startButton.getLayoutParams();
+        lp.height = size;
+        lp.width = size;
+        lp = loadingProgressBar.getLayoutParams();
+        lp.height = size;
+        lp.width = size;
     }
 
     @Override
@@ -150,7 +158,7 @@ public class JCVideoPlayerStandard extends JCVideoPlayer {
                     }
                     break;
             }
-        } else if (id == R.id.progress) {
+        } else if (id == R.id.bottom_seek_progress) {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     cancelDismissControlViewTimer();
@@ -173,11 +181,12 @@ public class JCVideoPlayerStandard extends JCVideoPlayer {
                 return;
             }
             if (currentState == CURRENT_STATE_NORMAL) {
-                if (!url.startsWith("file") && !JCUtils.isWifiConnected(getContext()) && !WIFI_TIP_DIALOG_SHOWED) {
+                if (!url.startsWith("file") && !url.startsWith("/") &&
+                        !JCUtils.isWifiConnected(getContext()) && !WIFI_TIP_DIALOG_SHOWED) {
                     showWifiDialog();
                     return;
                 }
-                startPlayLogic();
+                startVideo();
             } else if (currentState == CURRENT_STATE_AUTO_COMPLETE) {
                 onClickUiToggle();
             }
@@ -186,14 +195,6 @@ public class JCVideoPlayerStandard extends JCVideoPlayer {
         } else if (i == R.id.back) {
             backPress();
         } else if (i == R.id.back_tiny) {
-            if (JCVideoPlayerManager.CURRENT_SCROLL_LISTENER.get() != null) {
-                if (JCVideoPlayerManager.CURRENT_SCROLL_LISTENER.get().getUrl() != JCMediaManager.instance().mediaPlayer.getDataSource()) {
-//                    if (!((JCVideoPlayer) JCVideoPlayerManager.CURRENT_SCROLL_LISTENER.get(0).get()).isShown()) {
-                    releaseAllVideos();
-                    return;
-//                    }
-                }
-            }
             backPress();
         }
     }
@@ -208,7 +209,7 @@ public class JCVideoPlayerStandard extends JCVideoPlayer {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                startPlayLogic();
+                startVideo();
                 WIFI_TIP_DIALOG_SHOWED = true;
             }
         });
@@ -233,8 +234,8 @@ public class JCVideoPlayerStandard extends JCVideoPlayer {
         startDismissControlViewTimer();
     }
 
-    public void startPlayLogic() {
-        prepareVideo();
+    public void startVideo() {
+        prepareMediaPlayer();
         onEvent(JCUserActionStandard.ON_CLICK_START_THUMB);
     }
 
@@ -272,11 +273,48 @@ public class JCVideoPlayerStandard extends JCVideoPlayer {
         }
     }
 
+    public void onCLickUiToggleToClear() {
+        if (currentState == CURRENT_STATE_PREPARING) {
+            if (bottomContainer.getVisibility() == View.VISIBLE) {
+                changeUiToPreparingClear();
+            } else {
+            }
+        } else if (currentState == CURRENT_STATE_PLAYING) {
+            if (bottomContainer.getVisibility() == View.VISIBLE) {
+                changeUiToPlayingClear();
+            } else {
+            }
+        } else if (currentState == CURRENT_STATE_PAUSE) {
+            if (bottomContainer.getVisibility() == View.VISIBLE) {
+                changeUiToPauseClear();
+            } else {
+            }
+        } else if (currentState == CURRENT_STATE_AUTO_COMPLETE) {
+            if (bottomContainer.getVisibility() == View.VISIBLE) {
+                changeUiToCompleteClear();
+            } else {
+            }
+        } else if (currentState == CURRENT_STATE_PLAYING_BUFFERING_START) {
+            if (bottomContainer.getVisibility() == View.VISIBLE) {
+                changeUiToPlayingBufferingClear();
+            } else {
+            }
+        }
+    }
+
     @Override
-    public void setProgressAndTime(int progress, int secProgress, int currentTime, int totalTime) {
-        super.setProgressAndTime(progress, secProgress, currentTime, totalTime);
+    public void setProgressAndText() {
+        super.setProgressAndText();
+        int position = getCurrentPositionWhenPlaying();
+        int duration = getDuration();
+        int progress = position * 100 / (duration == 0 ? 1 : duration);
         if (progress != 0) bottomProgressBar.setProgress(progress);
-        if (secProgress != 0) bottomProgressBar.setSecondaryProgress(secProgress);
+    }
+
+    @Override
+    public void setBufferProgress(int bufferProgress) {
+        super.setBufferProgress(bufferProgress);
+        if (bufferProgress != 0) bottomProgressBar.setSecondaryProgress(bufferProgress);
     }
 
     @Override
@@ -495,7 +533,6 @@ public class JCVideoPlayerStandard extends JCVideoPlayer {
     }
 
     public void changeUiToError() {
-        clearCacheImage();
         switch (currentScreen) {
             case SCREEN_LAYOUT_NORMAL:
             case SCREEN_LAYOUT_LIST:
@@ -520,12 +557,7 @@ public class JCVideoPlayerStandard extends JCVideoPlayer {
         bottomContainer.setVisibility(bottomCon);
         startButton.setVisibility(startBtn);
         loadingProgressBar.setVisibility(loadingPro);
-        if (thumbImg == View.VISIBLE) {
-            thumbImageView.setVisibility(thumbImg);
-        } else {
-            thumbImageView.setVisibility(View.GONE);
-        }
-        coverImageView.setVisibility(coverImg);
+        thumbImageView.setVisibility(thumbImg);
         bottomProgressBar.setVisibility(bottomPro);
     }
 
@@ -550,7 +582,7 @@ public class JCVideoPlayerStandard extends JCVideoPlayer {
     public void showProgressDialog(float deltaX, String seekTime, int seekTimePosition, String totalTime, int totalTimeDuration) {
         super.showProgressDialog(deltaX, seekTime, seekTimePosition, totalTime, totalTimeDuration);
         if (mProgressDialog == null) {
-            View localView = LayoutInflater.from(getContext()).inflate(R.layout.jc_progress_dialog, null);
+            View localView = LayoutInflater.from(getContext()).inflate(R.layout.jc_dialog_progress, null);
             mDialogProgressBar = ((ProgressBar) localView.findViewById(R.id.duration_progressbar));
             mDialogSeekTime = ((TextView) localView.findViewById(R.id.tv_current));
             mDialogTotalTime = ((TextView) localView.findViewById(R.id.tv_duration));
@@ -562,8 +594,7 @@ public class JCVideoPlayerStandard extends JCVideoPlayer {
             mProgressDialog.getWindow().addFlags(16);
             mProgressDialog.getWindow().setLayout(-2, -2);
             WindowManager.LayoutParams localLayoutParams = mProgressDialog.getWindow().getAttributes();
-            localLayoutParams.gravity = 49;
-            localLayoutParams.y = getResources().getDimensionPixelOffset(fm.jiecao.jcvideoplayer_lib.R.dimen.jc_progress_dialog_margin_top);
+            localLayoutParams.gravity = Gravity.CENTER;
             mProgressDialog.getWindow().setAttributes(localLayoutParams);
         }
         if (!mProgressDialog.isShowing()) {
@@ -578,7 +609,7 @@ public class JCVideoPlayerStandard extends JCVideoPlayer {
         } else {
             mDialogIcon.setBackgroundResource(R.drawable.jc_backward_icon);
         }
-
+        onCLickUiToggleToClear();
     }
 
     @Override
@@ -589,15 +620,18 @@ public class JCVideoPlayerStandard extends JCVideoPlayer {
         }
     }
 
-
     protected Dialog mVolumeDialog;
     protected ProgressBar mDialogVolumeProgressBar;
+    protected TextView mDialogVolumeTextView;
+    protected ImageView mDialogVolumeImageView;
 
     @Override
     public void showVolumeDialog(float deltaY, int volumePercent) {
         super.showVolumeDialog(deltaY, volumePercent);
         if (mVolumeDialog == null) {
-            View localView = LayoutInflater.from(getContext()).inflate(R.layout.jc_volume_dialog, null);
+            View localView = LayoutInflater.from(getContext()).inflate(R.layout.jc_dialog_volume, null);
+            mDialogVolumeImageView = ((ImageView) localView.findViewById(R.id.volume_image_tip));
+            mDialogVolumeTextView = ((TextView) localView.findViewById(R.id.tv_volume));
             mDialogVolumeProgressBar = ((ProgressBar) localView.findViewById(R.id.volume_progressbar));
             mVolumeDialog = new Dialog(getContext(), R.style.jc_style_dialog_progress);
             mVolumeDialog.setContentView(localView);
@@ -606,15 +640,25 @@ public class JCVideoPlayerStandard extends JCVideoPlayer {
             mVolumeDialog.getWindow().addFlags(16);
             mVolumeDialog.getWindow().setLayout(-2, -2);
             WindowManager.LayoutParams localLayoutParams = mVolumeDialog.getWindow().getAttributes();
-            localLayoutParams.gravity = 19;
-            localLayoutParams.x = getContext().getResources().getDimensionPixelOffset(R.dimen.jc_volume_dialog_margin_left);
+            localLayoutParams.gravity = Gravity.CENTER;
             mVolumeDialog.getWindow().setAttributes(localLayoutParams);
         }
         if (!mVolumeDialog.isShowing()) {
             mVolumeDialog.show();
         }
-
+        if (volumePercent <= 0) {
+            mDialogVolumeImageView.setBackgroundResource(R.drawable.jc_close_volume);
+        } else {
+            mDialogVolumeImageView.setBackgroundResource(R.drawable.jc_add_volume);
+        }
+        if (volumePercent > 100) {
+            volumePercent = 100;
+        } else if (volumePercent < 0) {
+            volumePercent = 0;
+        }
+        mDialogVolumeTextView.setText(volumePercent + "%");
         mDialogVolumeProgressBar.setProgress(volumePercent);
+        onCLickUiToggleToClear();
     }
 
     @Override
@@ -622,6 +666,49 @@ public class JCVideoPlayerStandard extends JCVideoPlayer {
         super.dismissVolumeDialog();
         if (mVolumeDialog != null) {
             mVolumeDialog.dismiss();
+        }
+    }
+
+    protected Dialog mBrightnessDialog;
+    protected ProgressBar mDialogBrightnessProgressBar;
+    protected TextView mDialogBrightnessTextView;
+
+    @Override
+    public void showBrightnessDialog(int brightnessPercent) {
+        super.showBrightnessDialog(brightnessPercent);
+        if (mBrightnessDialog == null) {
+            View localView = LayoutInflater.from(getContext()).inflate(R.layout.jc_dialog_brightness, null);
+            mDialogBrightnessTextView = ((TextView) localView.findViewById(R.id.tv_brightness));
+            mDialogBrightnessProgressBar = ((ProgressBar) localView.findViewById(R.id.brightness_progressbar));
+            mBrightnessDialog = new Dialog(getContext(), R.style.jc_style_dialog_progress);
+            mBrightnessDialog.setContentView(localView);
+            mBrightnessDialog.getWindow().addFlags(Window.FEATURE_ACTION_BAR);
+            mBrightnessDialog.getWindow().addFlags(32);
+            mBrightnessDialog.getWindow().addFlags(16);
+            mBrightnessDialog.getWindow().setLayout(-2, -2);
+            WindowManager.LayoutParams localLayoutParams = mBrightnessDialog.getWindow().getAttributes();
+            localLayoutParams.gravity = Gravity.CENTER;
+            mBrightnessDialog.getWindow().setAttributes(localLayoutParams);
+
+        }
+        if (!mBrightnessDialog.isShowing()) {
+            mBrightnessDialog.show();
+        }
+        if (brightnessPercent > 100) {
+            brightnessPercent = 100;
+        } else if (brightnessPercent < 0) {
+            brightnessPercent = 0;
+        }
+        mDialogBrightnessTextView.setText(brightnessPercent + "%");
+        mDialogBrightnessProgressBar.setProgress(brightnessPercent);
+        onCLickUiToggleToClear();
+    }
+
+    @Override
+    public void dismissBrightnessDialog() {
+        super.dismissBrightnessDialog();
+        if (mBrightnessDialog != null) {
+            mBrightnessDialog.dismiss();
         }
     }
 
@@ -664,5 +751,17 @@ public class JCVideoPlayerStandard extends JCVideoPlayer {
                 }
             }
         }
+    }
+
+    @Override
+    public void onAutoCompletion() {
+        super.onAutoCompletion();
+        cancelDismissControlViewTimer();
+    }
+
+    @Override
+    public void onCompletion() {
+        super.onCompletion();
+        cancelDismissControlViewTimer();
     }
 }
