@@ -60,15 +60,16 @@
                 android:background="@drawable/btn_voice_selector" />
 
             <SeekBar
-
                 android:id="@+id/seekbar_voice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:maxHeight="6dp"
                 android:minHeight="6dp"
-                android:progressDrawable="@drawable/progress_horizontal"
-                android:thumb="@drawable/progress_thumb" />
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:progressDrawable="@drawable/jc_bottom_seek_progress"
+                android:thumb="@drawable/jc_bottom_seek_thumb"  />
 
             <Button
                 android:id="@+id/btn_swiche_player"
@@ -113,8 +114,8 @@
                 android:layout_weight="1"
                 android:maxHeight="6dp"
                 android:minHeight="6dp"
-                android:progressDrawable="@drawable/progress_horizontal"
-                android:thumb="@drawable/progress_thumb" />
+                android:progressDrawable="@drawable/jc_bottom_seek_progress"
+                android:thumb="@drawable/jc_bottom_seek_thumb"  />
 
             <TextView
                 android:layout_marginLeft="8dp"

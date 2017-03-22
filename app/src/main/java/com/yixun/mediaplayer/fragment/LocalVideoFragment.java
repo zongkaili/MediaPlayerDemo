@@ -1,8 +1,10 @@
 package com.yixun.mediaplayer.fragment;
 
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
@@ -13,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.yixun.mediaplayer.R;
+import com.yixun.mediaplayer.SystemVideoPlayerActivity;
 import com.yixun.mediaplayer.adapter.LocalVideoAdapter;
 import com.yixun.mediaplayer.bean.MediaItem;
 import com.yixun.videoplayer.YXVideoPlayerStandard;
@@ -62,18 +65,18 @@ public class LocalVideoFragment extends BaseFragment {
             MediaItem mediaItem = mediaItems.get(position);
 
             //系统播放器videoView播放界面
-//            Intent intent = new Intent(mContext,SystemVideoPlayerActivity.class);
-//            Bundle bundle = new Bundle();
-//            bundle.putSerializable("videolist",mediaItems);
-//            intent.putExtras(bundle);
-//            intent.putExtra("position",position);
-//            startActivity(intent);
+            Intent intent = new Intent(mContext,SystemVideoPlayerActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("videolist",mediaItems);
+            intent.putExtras(bundle);
+            intent.putExtra("position",position);
+            startActivity(intent);
 
             //播放网络视频
 //            JCVideoPlayerStandard.startFullscreen(mContext, JCVideoPlayerStandard.class, "http://2449.vod.myqcloud.com/2449_22ca37a6ea9011e5acaaf51d105342e3.f20.mp4", "嫂子辛苦了");
             //播放本地视频
-            YXVideoPlayerStandard.startFullscreen(mContext, YXVideoPlayerStandard.class,
-                    mediaItem.getData(), mediaItem.getName());
+//            YXVideoPlayerStandard.startFullscreen(mContext, YXVideoPlayerStandard.class,
+//                    mediaItem.getData(), mediaItem.getName());
 
         }
     }
