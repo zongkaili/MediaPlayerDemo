@@ -12,6 +12,9 @@ import com.yixun.mediaplayer.fragment.NetAudioFragment;
 
 import java.util.ArrayList;
 
+import fm.jiecao.jcvideoplayer_lib.JCVideoPlayer;
+import fm.jiecao.jcvideoplayer_lib.JCVideoPlayerStandard;
+
 /**
  * Created by zongkaili on 2017/3/21.
  */
@@ -51,10 +54,10 @@ public class MainActivity extends AppCompatActivity {
                         mPagePos = 1;
                         break;
                 }
-
                 //Fragment-当前的Fragment
                 Fragment currentFragment = mFragments.get(mPagePos);
                 switchFragment(currentFragment);
+
             }
         });
 
@@ -84,4 +87,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    @Override
+    public void onBackPressed() {
+        if (JCVideoPlayer.backPress()) {
+            return;
+        }
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        JCVideoPlayer.releaseAllVideos();
+    }
 }

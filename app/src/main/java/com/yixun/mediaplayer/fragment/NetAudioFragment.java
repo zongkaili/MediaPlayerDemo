@@ -17,9 +17,18 @@ import android.widget.TextView;
 import com.yixun.mediaplayer.R;
 import com.yixun.mediaplayer.SystemVideoPlayerActivity;
 import com.yixun.mediaplayer.adapter.LocalVideoAdapter;
+import com.yixun.mediaplayer.adapter.NetAudioAdapter;
 import com.yixun.mediaplayer.bean.MediaItem;
+import com.yixun.mediaplayer.bean.NetAudioBean;
+import com.yixun.mediaplayer.utils.Constant;
+
+import org.xutils.common.Callback;
+import org.xutils.http.RequestParams;
+import org.xutils.x;
 
 import java.util.ArrayList;
+
+import fm.jiecao.jcvideoplayer_lib.JCVideoPlayerStandard;
 
 /**
  * Created by zongkaili on 2017/3/21.
@@ -28,7 +37,7 @@ public class NetAudioFragment extends BaseFragment {
     private static final String TAG = LocalVideoFragment.class.getSimpleName();
     private ListView listview;
     private TextView tv_no_media;
-    private LocalVideoAdapter adapter;
+    private NetAudioAdapter adapter;
     private ArrayList<MediaItem> mediaItems;
 
     private Handler handler = new Handler(){
@@ -37,7 +46,7 @@ public class NetAudioFragment extends BaseFragment {
             super.handleMessage(msg);
             if (mediaItems != null && mediaItems.size() >0) {
                 tv_no_media.setVisibility(View.GONE);
-                adapter = new LocalVideoAdapter(mContext,mediaItems, true);
+                adapter = new NetAudioAdapter(mContext,mediaItems, true);
                 listview.setAdapter(adapter);
             } else {
                 tv_no_media.setVisibility(View.VISIBLE);
@@ -77,15 +86,17 @@ public class NetAudioFragment extends BaseFragment {
 //            intent.setDataAndType(Uri.parse(mediaItem.getData()),"video/*");//一个播放地址
 //            startActivity(intent);
             //3.传递列表数据
-            Intent intent = new Intent(mContext,SystemVideoPlayerActivity.class);
+//            Intent intent = new Intent(mContext,SystemVideoPlayerActivity.class);
+//
+//            Bundle bundle = new Bundle();
+//            //列表数据
+//            bundle.putSerializable("videolist",mediaItems);
+//            intent.putExtras(bundle);
+//            //传递点击的位置
+//            intent.putExtra("position",position);
+//            startActivity(intent);
 
-            Bundle bundle = new Bundle();
-            //列表数据
-            bundle.putSerializable("videolist",mediaItems);
-            intent.putExtras(bundle);
-            //传递点击的位置
-            intent.putExtra("position",position);
-            startActivity(intent);
+            JCVideoPlayerStandard.startFullscreen(mContext, JCVideoPlayerStandard.class, "http://2449.vod.myqcloud.com/2449_22ca37a6ea9011e5acaaf51d105342e3.f20.mp4", "嫂子辛苦了");
 
         }
     }
@@ -96,6 +107,7 @@ public class NetAudioFragment extends BaseFragment {
         Log.e("TAG", "本地视频数据初始化了。。");
         //在子线程中加载视频
         getDataFromLocal();
+//        getDataFromNet();
     }
 
     /**
@@ -154,6 +166,53 @@ public class NetAudioFragment extends BaseFragment {
 
     }
 
+    private void getDataFromNet() {
+        RequestParams params = new RequestParams(Constant.NET_AUDIO);
+        x.http().get(params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+
+                Log.e("TAG", "网络音乐请求成功" + result);
+//                processData(result);
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                Log.e("TAG", "网络音乐请求失败" + ex.getMessage());
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+
+            }
+
+            @Override
+            public void onFinished() {
+
+            }
+        });
+    }
+
+//    private void processData(String json) {
+//        NetAudioBean netAudioBean = new Gson().fromJson(json, NetAudioBean.class);
+//        mediaItems = netAudioBean.getList();
+//
+//
+//        Log.e("TAG","解决成功=="+listDatas.get(0).getText());
+//        if(listDatas != null && listDatas.size() >0){
+//            //有视频
+//            tvNomedia.setVisibility(View.GONE);
+//            //设置适配器
+//            myAdapter = new NetAudioFragmentAdapter(mContext,listDatas);
+//            listview.setAdapter(myAdapter);
+//        }else{
+//            //没有视频
+//            tvNomedia.setVisibility(View.VISIBLE);
+//        }
+//
+//        progressbar.setVisibility(View.GONE);
+//
+//    }
 
     @Override
     public void onRefrshData() {

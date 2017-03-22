@@ -22,6 +22,9 @@ import com.yixun.mediaplayer.bean.MediaItem;
 
 import java.util.ArrayList;
 
+import fm.jiecao.jcvideoplayer_lib.JCVideoPlayer;
+import fm.jiecao.jcvideoplayer_lib.JCVideoPlayerStandard;
+
 
 /**
  * Created by zongkaili on 2017/3/21.
@@ -64,30 +67,20 @@ public class LocalVideoFragment extends BaseFragment {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             MediaItem mediaItem = mediaItems.get(position);
-//            Toast.makeText(mContext, "mediaItem=="+mediaItem.toString(), Toast.LENGTH_SHORT).show();
-            //
-            //1.调起系统的播放器播放视频--隐式意图
-//            Intent intent = new Intent();
-//            //第一参数：播放路径
-//            //第二参数：路径对应的类型
-//            intent.setDataAndType(Uri.parse(mediaItem.getData()),"video/*");
-//            startActivity(intent);
-            //2.调起自定义播放器
-//            Intent intent = new Intent(mContext,SystemVideoPlayerActivity.class);
-//            //第一参数：播放路径
-//            //第二参数：路径对应的类型
-//            intent.setDataAndType(Uri.parse(mediaItem.getData()),"video/*");//一个播放地址
-//            startActivity(intent);
-            //3.传递列表数据
-            Intent intent = new Intent(mContext,SystemVideoPlayerActivity.class);
 
-            Bundle bundle = new Bundle();
-            //列表数据
-            bundle.putSerializable("videolist",mediaItems);
-            intent.putExtras(bundle);
-            //传递点击的位置
-            intent.putExtra("position",position);
-            startActivity(intent);
+            //系统播放器videoView播放界面
+//            Intent intent = new Intent(mContext,SystemVideoPlayerActivity.class);
+//            Bundle bundle = new Bundle();
+//            bundle.putSerializable("videolist",mediaItems);
+//            intent.putExtras(bundle);
+//            intent.putExtra("position",position);
+//            startActivity(intent);
+
+            //播放网络视频
+//            JCVideoPlayerStandard.startFullscreen(mContext, JCVideoPlayerStandard.class, "http://2449.vod.myqcloud.com/2449_22ca37a6ea9011e5acaaf51d105342e3.f20.mp4", "嫂子辛苦了");
+            //播放本地视频
+            JCVideoPlayerStandard.startFullscreen(mContext, JCVideoPlayerStandard.class,
+                    mediaItem.getData(), mediaItem.getName());
 
         }
     }
