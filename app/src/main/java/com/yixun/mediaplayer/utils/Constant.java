@@ -1,11 +1,5 @@
 package com.yixun.mediaplayer.utils;
 
-/**
- * 作者：尚硅谷-杨光福 on 2017/1/10 16:20
- * 微信：yangguangfu520
- * QQ号：541433511
- * 作用：联网的路径
- */
 public class Constant {
 
 //    public static final String BASE_URL = "http://192.168.11.218:8080/web_home";

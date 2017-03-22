@@ -2,7 +2,7 @@ package com.yixun.mediaplayer.bean;
 
 import java.util.List;
 
-public class NetAudioBean {
+public class NetVideoBean {
     private InfoBean info;
     private List<ListBean> list;
 

@@ -8,12 +8,10 @@ import android.widget.RadioGroup;
 
 import com.yixun.mediaplayer.fragment.BaseFragment;
 import com.yixun.mediaplayer.fragment.LocalVideoFragment;
-import com.yixun.mediaplayer.fragment.NetAudioFragment;
+import com.yixun.mediaplayer.fragment.NetVideoFragment;
+import com.yixun.videoplayer.YXVideoPlayer;
 
 import java.util.ArrayList;
-
-import fm.jiecao.jcvideoplayer_lib.JCVideoPlayer;
-import fm.jiecao.jcvideoplayer_lib.JCVideoPlayerStandard;
 
 /**
  * Created by zongkaili on 2017/3/21.
@@ -39,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private void initFragment() {
         mFragments = new ArrayList<>();
         mFragments.add(new LocalVideoFragment());//本地视频
-        mFragments.add(new NetAudioFragment());//本地音乐
+        mFragments.add(new NetVideoFragment());//网络视频
     }
 
     private void initListenter() {
@@ -90,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (JCVideoPlayer.backPress()) {
+        if (YXVideoPlayer.backPress()) {
             return;
         }
         super.onBackPressed();
@@ -99,6 +97,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        JCVideoPlayer.releaseAllVideos();
+        YXVideoPlayer.releaseAllVideos();
     }
 }

@@ -1,4 +1,4 @@
-package fm.jiecao.jcvideoplayer_lib;
+package fm.jiecao.videoplayer;
 
 import org.junit.Test;
 
