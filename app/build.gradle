@@ -26,6 +26,7 @@ dependencies {
     })
     testCompile 'junit:junit:4.12'
     compile project(':videoplayer-lib')
+    compile project(':YXTabLayout_lib')
     compile 'com.android.support:appcompat-v7:25.1.0'
     compile 'com.github.bumptech.glide:glide:3.5.2'
     compile 'com.android.support:recyclerview-v7:25.1.0'

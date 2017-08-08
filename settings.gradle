@@ -1,1 +1,1 @@
-include ':app', ':videoplayer-lib'
+include ':app', ':videoplayer-lib', ':YXTabLayout_lib'
